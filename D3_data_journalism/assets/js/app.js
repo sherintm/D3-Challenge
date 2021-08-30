@@ -45,7 +45,7 @@ function xScale(healthRiskData, chosenXAxis) {
 function yScale(healthRiskData, chosenYAxis) {
     // create scales
     var yLinearScale = d3.scaleLinear()
-      .domain([d3.min(healthRiskData, d => d[chosenYAxis]),
+      .domain([d3.min(healthRiskData, d => d[chosenYAxis]) * 0.8,
         d3.max(healthRiskData, d => d[chosenYAxis])
       ])
       .range([height, 0]);
@@ -77,22 +77,29 @@ function renderYAxes(newYScale, yAxis) {
   }
   
 // function used for updating circles group with a transition to new X values
-function renderXCircles(circlesGroup, newXScale, chosenXAxis) {
+function renderXCircles(circlesGroup, circlesLabel, newXScale, chosenXAxis) {
 
   circlesGroup.transition()
     .duration(1000)
     .attr("cx", d => newXScale(d[chosenXAxis]));
 
+    circlesLabel.transition()
+    .duration(1000)
+    .attr("dx", d => newXScale(d[chosenXAxis]))
+
   return circlesGroup;
 }
 
 // function used for updating circles group with a transition to new Y values
-function renderYCircles(circlesGroup, newYScale, chosenYAxis) {
+function renderYCircles(circlesGroup, circlesLabel, newYScale, chosenYAxis) {
 
     circlesGroup.transition()
       .duration(1000)
       .attr("cy", d => newYScale(d[chosenYAxis]));
-  
+      
+    circlesLabel.transition()
+    .duration(1000)
+    .attr("dy", d => newYScale(d[chosenYAxis]))
     return circlesGroup;
   }
 
@@ -200,6 +207,18 @@ d3.csv("assets/data/data.csv").then(function(healthRiskData, err) {
     .attr("fill", "blue")
     .attr("opacity", ".5");
 
+  var circlesLabel = chartGroup.selectAll(null)
+    .data(healthRiskData)
+    .enter()
+    .append("text")
+    .attr("dx", d => xLinearScale(d[chosenXAxis]))
+    .attr("dy", d => yLinearScale(d[chosenYAxis]))
+    .text(d => d.abbr)
+    .attr("font-size", "11px")
+    .attr("text-anchor", "middle")
+    .attr("alignment-baseline", "middle")
+    .attr("fill", "white");
+
   // Create group for 3 x-axis labels
   var xlabelsGroup = chartGroup.append("g")
     .attr("transform", `translate(${width / 2}, ${height + 20})`);
@@ -277,7 +296,8 @@ d3.csv("assets/data/data.csv").then(function(healthRiskData, err) {
         xAxis = renderXAxes(xLinearScale, xAxis);
 
         // updates circles with new x values
-        circlesGroup = renderXCircles(circlesGroup, xLinearScale, chosenXAxis);
+        circlesGroup = renderXCircles(circlesGroup, circlesLabel, xLinearScale, chosenXAxis);
+        
 
         // updates tooltips with new info
         circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
@@ -326,26 +346,26 @@ d3.csv("assets/data/data.csv").then(function(healthRiskData, err) {
     var value = d3.select(this).attr("value");
     if (value !== chosenYAxis) {
 
-      // replaces chosenXAxis with value
+      // replaces chosenYAxis with value
       chosenYAxis = value;
 
       // console.log(chosenXAxis)
 
       // functions here found above csv import
       // updates y scale for new data
-      yLinearScale = xScale(healthRiskData, chosenYAxis);
+      yLinearScale = yScale(healthRiskData, chosenYAxis);
 
       // updates y axis with transition
       yAxis = renderYAxes(yLinearScale, yAxis);
 
       // updates circles with new y values
-      circlesGroup = renderYCircles(circlesGroup, yLinearScale, chosenYAxis);
+      circlesGroup = renderYCircles(circlesGroup, circlesLabel, yLinearScale, chosenYAxis);
 
       // updates tooltips with new info
       circlesGroup = updateToolTip(chosenXAxis, chosenYAxis, circlesGroup);
 
      // changes classes to change bold text
-      if (chosenXAxis === "obesity") {
+      if (chosenYAxis === "obesity") {
         obeseLabel
           .classed("active", true)
           .classed("inactive", false);
@@ -356,7 +376,7 @@ d3.csv("assets/data/data.csv").then(function(healthRiskData, err) {
           .classed("active", false)
           .classed("inactive", true);
       }
-      else if (chosenXAxis === "smokes") {
+      else if (chosenYAxis === "smokes") {
           smokesLabel
             .classed("active", true)
             .classed("inactive", false);
