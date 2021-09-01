@@ -9,6 +9,6 @@ This project contains an analysis of the current trends shaping people's lives, 
 <li>Healthcare</li>
 </ul>
 
-Scatter plot contains circles with the abrreviation for each state it represents. A tooltip appears with the corresponding data during mouse over of the circle. Reader can select the data they want to see in both axes. A sample plot looks as following.
+Scatter plot contains circles with the abrreviation for each state it represents. A tooltip appears with the corresponding data during mouse over of the circle. Reader can select the data they want to see in both axes. A sample plot looks as following.<br>
 ![HealthRiskAnalysis](D3_data_journalism/Screenshots/health_analysis.png "Webpage screenshot")
 
